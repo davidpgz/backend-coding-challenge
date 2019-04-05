@@ -35,7 +35,8 @@ func (a *App) Initialize() {
 	})
 
 	a.router = router
-	a.cityRepository = &cityRepository{}
+	cityRepository := createCityRepositoryFor("./data/cities_canada-usa.tsv")
+	a.cityRepository = &cityRepository
 }
 
 func parseRawQuery(rawQuery string) string {
