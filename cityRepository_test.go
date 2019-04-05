@@ -7,7 +7,8 @@ import (
 )
 
 func createCityRepository() cityRepository {
-	return createCityRepositoryFor("./data/cities_canada-usa.tsv")
+	cityRepository, _ := createCityRepositoryFor("./data/cities_canada-usa.tsv")
+	return cityRepository
 }
 
 func TestFindSuggestionsForExactName(t *testing.T) {

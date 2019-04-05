@@ -14,6 +14,9 @@ func main() {
 	}
 
 	app := App{}
-	app.Initialize()
+	err := app.Initialize()
+	if err != nil {
+		log.Fatal(err)
+	}
 	app.Run(port)
 }

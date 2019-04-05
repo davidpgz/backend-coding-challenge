@@ -35,23 +35,23 @@ type cityRepositoryInterface interface {
 }
 
 // Creates a CityRepository using TSV file as the data source.
-func createCityRepositoryFor(sourceTsvFilePath string) cityRepository {
-	cityRepository := cityRepository{}
+func createCityRepositoryFor(sourceTsvFilePath string) (cityRepository, error) {
+	repository := cityRepository{}
 
-	tsvFile, _ := os.Open(sourceTsvFilePath)
-	// if err != nil {
-	// 	return result, err
-	// }
+	tsvFile, err := os.Open(sourceTsvFilePath)
+	if err != nil {
+		return repository, err
+	}
 	defer tsvFile.Close()
 
 	reader := createReaderForTsvFileAndQuoteInValues(tsvFile)
-	records, _ := reader.ReadAll()
-	// if err != nil {
-	// 	return result, err
-	// }
+	records, err := reader.ReadAll()
+	if err != nil {
+		return repository, err
+	}
 
-	cityRepository.records = records
-	return cityRepository
+	repository.records = records
+	return repository, nil
 }
 
 func createReaderForTsvFileAndQuoteInValues(tsvFile *os.File) *csv.Reader {
