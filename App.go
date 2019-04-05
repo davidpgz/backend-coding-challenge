@@ -25,7 +25,8 @@ func (a *App) Initialize() {
 	a.router = router
 }
 
-// Launch the web service
+// Run the web service.
+// The App struct have to be initialized before calling this function.
 func (a *App) Run(port string) {
 	a.router.Run(":" + port)
 }
