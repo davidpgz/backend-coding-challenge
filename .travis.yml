@@ -1,0 +1,27 @@
+language: go
+go:
+- 1.x
+
+notifications:
+  email: false
+
+env:
+  GO111MODULE=on
+
+jobs:
+  include:
+  - stage: unit tests
+    script: 
+    - go get ${gobuild_args} ./...
+    - go test -v ./...
+  - stage: deploy to staging
+    script: make
+    deploy:
+      provider: heroku
+      app: mysterious-atoll-78710
+      api_key:
+        secure: VKa6Xdny3cig1i9zNjjZFAe/6VeyFCnXYuJ7wxMz0+tyzK381eHK1TwgcoNU+UrEwP9gBrXK9ONZxgpbiXdM3uaGkgMWpMO1tNKaZtD6KcgttXoJaF63L8haL5L0qG3KFp1v/y4Cyi1JGHCH8IoL7JwGmkC0lxLT0eY1u5CWazXoWmAiADz9y7bzGBpM9+k4MECcD5sXtd1wRDCnsh9CQ6f7ZQ088ZYMuP6QRwPmdbz2EqiEEyXIFVNR2QzFas0KVjoGC55r54Auqaipw8zRB7OX22OPiVdIaWGJfsj6FBORki7m8UIVGNhD+/CcHUmoI4XzaIcCFY9FsgW8LdMlnb62wWcCfK6uphDWESbfA/yyvZX15Iwy2kV/heWCl/AX1SQBE7eXMhoQT8tejtpcvZSYONeeSeLZ0q7sRLk/R+a5vKGgjn8anaVoNy/obe6ru8u8a2ltstlZ9GZwWrHCCoP/Evux2o8Ox1vGoK2MHS2J3lEmttPFMxd/aIZftEV3yqhCO4QZdUk5BysnsivzF4GDDGSzABDZKoIfXDtq2PH2qw1qE9IaX++U/Kp8mGB3hFSbsF/B2OD1xJxUdMCCJKYPP85zzm1oUkhcmLHipPiY6VOWYUoo2hELj1iuKXiKkST0BAHdJHy9d2N7hwe3r073bpq0iFn07qgNLGXwX0I=
+      on:
+        repo: davidpgz/backend-coding-challenge
+  - stage: test staging
+    script: curl https://mysterious-atoll-78710.herokuapp.com
