@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/davidpgz/backend-coding-challenge.svg?token=hRZMzEUnmPPYpzSebM5x&branch=master)](https://travis-ci.com/davidpgz/backend-coding-challenge)
+[![Heroku](https://heroku-badge.herokuapp.com/?app=mysterious-atoll-78710&svg=1)](https://mysterious-atoll-78710.herokuapp.com)
+
 # Coveo Backend Coding Challenge
 (inspired by https://github.com/busbud/coding-challenge-backend-c)
 
