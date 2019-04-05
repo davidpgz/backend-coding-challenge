@@ -28,18 +28,14 @@ func (app *App) serveGetSuggestions(path string) *httptest.ResponseRecorder {
 }
 
 func TestInitializeCanServeGetSuggestions(t *testing.T) {
-	assert := assert.New(t)
-
 	app := App{}
 	app.Initialize()
 	recorder := app.serveGetSuggestions(suggestionsPath)
 
-	assert.Equal(http.StatusOK, recorder.Code)
+	assert.New(t).Equal(http.StatusOK, recorder.Code)
 }
 
 func TestGetSuggestionsParseRawQuery(t *testing.T) {
-	assert := assert.New(t)
-
 	var wasCalledWithParsedQuery bool
 	app := App{}
 	app.Initialize()
@@ -52,12 +48,10 @@ func TestGetSuggestionsParseRawQuery(t *testing.T) {
 
 	app.serveGetSuggestions(suggestionsPath + "?q=something")
 
-	assert.True(wasCalledWithParsedQuery)
+	assert.New(t).True(wasCalledWithParsedQuery)
 }
 
 func TestGetSuggestionsShouldServeJsonData(t *testing.T) {
-	assert := assert.New(t)
-
 	expectedSuggestions := suggestions{[]match{match{Name: "something", Longitude: -1.2, Latitude: 3.4, Score: 0.5}}}
 	app := App{}
 	app.Initialize()
@@ -71,5 +65,5 @@ func TestGetSuggestionsShouldServeJsonData(t *testing.T) {
 
 	var result suggestions
 	json.Unmarshal(recorder.Body.Bytes(), &result)
-	assert.Equal(expectedSuggestions, result)
+	assert.New(t).Equal(expectedSuggestions, result)
 }
