@@ -2,13 +2,19 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	suggestionsPath = "/suggestions"
+)
+
 // App root struct used to configure the REST web API
 type App struct {
-	router *gin.Engine
+	router         *gin.Engine
+	cityRepository cityRepositoryInterface
 }
 
 // Initialize the App struct before the Run function is called
@@ -22,7 +28,18 @@ func (a *App) Initialize() {
 		c.HTML(http.StatusOK, "index.tmpl.html", nil)
 	})
 
+	router.GET(suggestionsPath, func(context *gin.Context) {
+		query := parseRawQuery(context.Request.URL.RawQuery)
+		suggestions := a.cityRepository.findSuggestionsFor(query)
+		context.JSON(http.StatusOK, suggestions)
+	})
+
 	a.router = router
+	a.cityRepository = &cityRepository{}
+}
+
+func parseRawQuery(rawQuery string) string {
+	return strings.Replace(rawQuery, "q=", "", 1)
 }
 
 // Run the web service.
