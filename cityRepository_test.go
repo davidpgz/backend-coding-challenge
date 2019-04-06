@@ -30,7 +30,7 @@ func TestFindSuggestionsForEmptyName(t *testing.T) {
 	cityRepository := createCityRepository()
 
 	result := cityRepository.findSuggestionsFor("")
-	
+
 	assert.New(t).Empty(result.Suggestions)
 	assert.New(t).NotNil(result.Suggestions)
 }
@@ -68,4 +68,28 @@ func TestFindSuggestionsForAppendsAdmin1LevelAndCountryCodeToTheName(t *testing.
 func TestCreateCityRepositoryForParseTsvFileData(t *testing.T) {
 	cityRepository := createCityRepository()
 	assert.New(t).NotEmpty(cityRepository.records)
+}
+
+func TestFindRankedSuggestionsForExactName(t *testing.T) {
+	cityRepository := createCityRepository()
+	result := cityRepository.FindRankedSuggestionsFor("Québec")
+	assert.New(t).Equal(float32(1.0), result.Suggestions[0].Score)
+}
+
+func TestFindRankedSuggestionsForPartialName(t *testing.T) {
+	cityRepository := createCityRepository()
+	result := cityRepository.FindRankedSuggestionsFor("qué")
+	assert.New(t).Equal(float32(3.0/6.0), result.Suggestions[0].Score)
+}
+
+func TestFindRankedSuggestionsForPartialAsciiName(t *testing.T) {
+	cityRepository := createCityRepository()
+	result := cityRepository.FindRankedSuggestionsFor("queb")
+	assert.New(t).Equal(float32(4.0/6.0), result.Suggestions[0].Score)
+}
+
+func TestFindRankedSuggestionsForPartialAlternateName(t *testing.T) {
+	cityRepository := createCityRepository()
+	result := cityRepository.FindRankedSuggestionsFor("udad ti Que")
+	assert.New(t).Equal(float32(11.0/16.0), result.Suggestions[0].Score)
 }

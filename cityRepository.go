@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 const (
@@ -63,7 +64,9 @@ func createReaderForTsvFileAndQuoteInValues(tsvFile *os.File) *csv.Reader {
 }
 
 func (repository *cityRepository) FindRankedSuggestionsFor(query string) suggestions {
-	return repository.findSuggestionsFor(query)
+	suggestions := repository.findSuggestionsFor(query)
+
+	return suggestions
 }
 
 func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
@@ -76,9 +79,13 @@ func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
 	queryName := strings.ToLower(query)
 
 	for _, record := range repository.records {
-		if matchQueryName(record, queryName) {
+		matched, score := matchQueryName(record, queryName)
+		if matched {
 			cityName := fetchCityNameOf(record)
-			match := match{Name: fmt.Sprintf("%s, %s, %s", cityName, fetchFirstAdministrationLevelOf(record), fetchCountryNameOf(record))}
+			match := match{
+				Name:  fmt.Sprintf("%s, %s, %s", cityName, fetchFirstAdministrationLevelOf(record), fetchCountryNameOf(record)),
+				Score: score,
+			}
 			result.Suggestions = append(result.Suggestions, match)
 		}
 	}
@@ -86,10 +93,53 @@ func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
 	return result
 }
 
-func matchQueryName(record []string, queryName string) (bool) {
-	return strings.Contains(strings.ToLower(fetchCityNameOf(record)), queryName) ||
-		strings.Contains(strings.ToLower(record[asciiname]), queryName) ||
-		strings.Contains(strings.ToLower(record[alternatenames]), queryName)
+func matchQueryName(record []string, queryName string) (bool, float32) {
+	matched := false
+	score := 0.0
+	if matched = strings.Contains(strings.ToLower(fetchCityNameOf(record)), queryName); matched {
+		score = computeScoreFor(queryName, fetchCityNameOf(record))
+	} else if matched = strings.Contains(strings.ToLower(record[asciiname]), queryName); matched {
+		score = computeScoreFor(queryName, record[asciiname])
+	} else if matched = strings.Contains(strings.ToLower(record[alternatenames]), queryName); matched {
+		indexMatch := strings.Index(strings.ToLower(record[alternatenames]), queryName)
+		alternateNames := []rune(record[alternatenames])
+
+		indexWordStart := findAlternateNameWordStartIndex(alternateNames, indexMatch)
+		indexWordEnd := findAlternateNameWordEndIndex(alternateNames, indexMatch+utf8.RuneCountInString(queryName))
+		matchedWholeWord := string(alternateNames[indexWordStart : indexWordEnd+1])
+
+		score = computeScoreFor(queryName, matchedWholeWord)
+	}
+	return matched, float32(score)
+}
+
+func computeScoreFor(queryName string, matchedWord string) float64 {
+	return float64(utf8.RuneCountInString(queryName)) / float64(utf8.RuneCountInString(matchedWord))
+}
+
+func findAlternateNameWordStartIndex(alternateNames []rune, searchStartIndex int) int {
+	wordStartIndex := searchStartIndex
+	for wordStartIndex > 0 {
+		if alternateNames[wordStartIndex] == ',' {
+			wordStartIndex++
+			break
+		}
+		wordStartIndex--
+	}
+	return wordStartIndex
+}
+
+func findAlternateNameWordEndIndex(alternateNames []rune, searchStartIndex int) int {
+	wordEndIndex := searchStartIndex
+	alternateNamesLength := len(alternateNames)
+	for wordEndIndex < alternateNamesLength {
+		if alternateNames[wordEndIndex] == ',' {
+			wordEndIndex--
+			break
+		}
+		wordEndIndex++
+	}
+	return wordEndIndex
 }
 
 func fetchCityNameOf(record []string) string {
