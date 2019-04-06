@@ -27,11 +27,16 @@ func (app *App) serveGetSuggestions(path string) *httptest.ResponseRecorder {
 	return recorder
 }
 
+func (app *App) mockFindRankedSuggestionsFor(funcMock func(string) suggestions) {
+	app.cityRepository = &MyMockedObject{funcMock}
+}
+
 func TestInitializeCanServeGetSuggestions(t *testing.T) {
 	app := App{}
-	app.Initialize()
-	recorder := app.serveGetSuggestions(suggestionsPath)
 
+	app.Initialize()
+
+	recorder := app.serveGetSuggestions(suggestionsPath)
 	assert.New(t).Equal(http.StatusOK, recorder.Code)
 }
 
@@ -39,12 +44,10 @@ func TestGetSuggestionsParseRawQuery(t *testing.T) {
 	var wasCalledWithParsedQuery bool
 	app := App{}
 	app.Initialize()
-	app.cityRepository = &MyMockedObject{
-		mockFindRankedSuggestionsFor: func(query string) suggestions {
+	app.mockFindRankedSuggestionsFor(func(query string) suggestions {
 			wasCalledWithParsedQuery = query == "something"
 			return suggestions{}
-		},
-	}
+		})
 
 	app.serveGetSuggestions(suggestionsPath + "?q=something")
 
@@ -55,11 +58,9 @@ func TestGetSuggestionsShouldServeJsonData(t *testing.T) {
 	expectedSuggestions := suggestions{[]match{match{Name: "something", Longitude: -1.2, Latitude: 3.4, Score: 0.5}}}
 	app := App{}
 	app.Initialize()
-	app.cityRepository = &MyMockedObject{
-		mockFindRankedSuggestionsFor: func(query string) suggestions {
+	app.mockFindRankedSuggestionsFor(func(query string) suggestions {
 			return expectedSuggestions
-		},
-	}
+		})
 
 	recorder := app.serveGetSuggestions(suggestionsPath + "?q=something")
 
