@@ -96,25 +96,30 @@ func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
 func matchQueryName(record []string, queryName string) (bool, float32) {
 	matched := false
 	score := 0.0
+
 	if matched = strings.Contains(strings.ToLower(fetchCityNameOf(record)), queryName); matched {
 		score = computeScoreFor(queryName, fetchCityNameOf(record))
 	} else if matched = strings.Contains(strings.ToLower(record[asciiname]), queryName); matched {
 		score = computeScoreFor(queryName, record[asciiname])
 	} else if matched = strings.Contains(strings.ToLower(record[alternatenames]), queryName); matched {
-		indexMatch := strings.Index(strings.ToLower(record[alternatenames]), queryName)
-		alternateNames := []rune(record[alternatenames])
-
-		indexWordStart := findAlternateNameWordStartIndex(alternateNames, indexMatch)
-		indexWordEnd := findAlternateNameWordEndIndex(alternateNames, indexMatch+utf8.RuneCountInString(queryName))
-		matchedWholeWord := string(alternateNames[indexWordStart : indexWordEnd+1])
-
+		matchedWholeWord := findMatchingAlternateNameWholeWord(record[alternatenames], queryName)
 		score = computeScoreFor(queryName, matchedWholeWord)
 	}
+
 	return matched, float32(score)
 }
 
 func computeScoreFor(queryName string, matchedWord string) float64 {
 	return float64(utf8.RuneCountInString(queryName)) / float64(utf8.RuneCountInString(matchedWord))
+}
+
+func findMatchingAlternateNameWholeWord(recordAlternateNames string, queryName string) string {
+	indexMatch := strings.Index(strings.ToLower(recordAlternateNames), queryName)
+	alternateNames := []rune(recordAlternateNames)
+
+	indexWordStart := findAlternateNameWordStartIndex(alternateNames, indexMatch)
+	indexWordEnd := findAlternateNameWordEndIndex(alternateNames, indexMatch+utf8.RuneCountInString(queryName))
+	return string(alternateNames[indexWordStart : indexWordEnd+1])
 }
 
 func findAlternateNameWordStartIndex(alternateNames []rune, searchStartIndex int) int {
