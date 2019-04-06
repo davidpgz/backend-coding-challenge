@@ -76,18 +76,20 @@ func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
 	queryName := strings.ToLower(query)
 
 	for _, record := range repository.records {
-		cityName := fetchCityNameOf(record)
-
-		if strings.Contains(strings.ToLower(cityName), queryName) ||
-			strings.Contains(strings.ToLower(record[asciiname]), queryName) ||
-			strings.Contains(strings.ToLower(record[alternatenames]), queryName) {
-
+		if matchQueryName(record, queryName) {
+			cityName := fetchCityNameOf(record)
 			match := match{Name: fmt.Sprintf("%s, %s, %s", cityName, fetchFirstAdministrationLevelOf(record), fetchCountryNameOf(record))}
 			result.Suggestions = append(result.Suggestions, match)
 		}
 	}
 
 	return result
+}
+
+func matchQueryName(record []string, queryName string) (bool) {
+	return strings.Contains(strings.ToLower(fetchCityNameOf(record)), queryName) ||
+		strings.Contains(strings.ToLower(record[asciiname]), queryName) ||
+		strings.Contains(strings.ToLower(record[alternatenames]), queryName)
 }
 
 func fetchCityNameOf(record []string) string {
