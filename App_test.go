@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type MyMockedObject struct {
+type mockCityRepository struct {
 	mockFindRankedSuggestionsFor func(string) suggestions
 }
 
-func (mock *MyMockedObject) FindRankedSuggestionsFor(query string) suggestions {
+func (mock *mockCityRepository) FindRankedSuggestionsFor(query string) suggestions {
 	if mock.mockFindRankedSuggestionsFor != nil {
 		return mock.mockFindRankedSuggestionsFor(query)
 	}
@@ -28,7 +28,7 @@ func (app *App) serveGetSuggestions(path string) *httptest.ResponseRecorder {
 }
 
 func (app *App) mockFindRankedSuggestionsFor(funcMock func(string) suggestions) {
-	app.cityRepository = &MyMockedObject{funcMock}
+	app.cityRepository = &mockCityRepository{funcMock}
 }
 
 func TestInitializeCanServeGetSuggestions(t *testing.T) {
