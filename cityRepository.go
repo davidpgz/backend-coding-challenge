@@ -63,7 +63,7 @@ func createReaderForTsvFileAndQuoteInValues(tsvFile *os.File) *csv.Reader {
 }
 
 func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
-	var result suggestions
+	result := suggestions{Suggestions: []match{}}
 
 	if query == "" {
 		return result

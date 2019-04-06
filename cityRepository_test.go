@@ -19,14 +19,20 @@ func TestFindSuggestionsForExactName(t *testing.T) {
 
 func TestFindSuggestionsForInexistantName(t *testing.T) {
 	cityRepository := createCityRepository()
+
 	result := cityRepository.findSuggestionsFor("SomeRandomCityInTheMiddleOfNowhere")
+
 	assert.New(t).Empty(result.Suggestions)
+	assert.New(t).NotNil(result.Suggestions)
 }
 
 func TestFindSuggestionsForEmptyName(t *testing.T) {
 	cityRepository := createCityRepository()
+
 	result := cityRepository.findSuggestionsFor("")
+	
 	assert.New(t).Empty(result.Suggestions)
+	assert.New(t).NotNil(result.Suggestions)
 }
 
 func TestFindSuggestionsForExactLowerCaseName(t *testing.T) {
