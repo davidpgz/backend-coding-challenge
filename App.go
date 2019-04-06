@@ -30,7 +30,7 @@ func (a *App) Initialize() error {
 
 	router.GET(suggestionsPath, func(context *gin.Context) {
 		query := parseRawQuery(context.Request.URL.RawQuery)
-		suggestions := a.cityRepository.findSuggestionsFor(query)
+		suggestions := a.cityRepository.FindRankedSuggestionsFor(query)
 		context.JSON(http.StatusOK, suggestions)
 	})
 

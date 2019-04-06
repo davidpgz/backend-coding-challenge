@@ -31,7 +31,7 @@ type cityRepository struct {
 }
 
 type cityRepositoryInterface interface {
-	findSuggestionsFor(string) suggestions
+	FindRankedSuggestionsFor(string) suggestions
 }
 
 // Creates a CityRepository using TSV file as the data source.
@@ -60,6 +60,10 @@ func createReaderForTsvFileAndQuoteInValues(tsvFile *os.File) *csv.Reader {
 	reader.FieldsPerRecord = -1
 	reader.LazyQuotes = true
 	return reader
+}
+
+func (repository *cityRepository) FindRankedSuggestionsFor(query string) suggestions {
+	return repository.findSuggestionsFor(query)
 }
 
 func (repository *cityRepository) findSuggestionsFor(query string) suggestions {

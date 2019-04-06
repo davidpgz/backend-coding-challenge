@@ -10,12 +10,12 @@ import (
 )
 
 type MyMockedObject struct {
-	mockFindSuggestionsFor func(string) suggestions
+	mockFindRankedSuggestionsFor func(string) suggestions
 }
 
-func (mock *MyMockedObject) findSuggestionsFor(query string) suggestions {
-	if mock.mockFindSuggestionsFor != nil {
-		return mock.mockFindSuggestionsFor(query)
+func (mock *MyMockedObject) FindRankedSuggestionsFor(query string) suggestions {
+	if mock.mockFindRankedSuggestionsFor != nil {
+		return mock.mockFindRankedSuggestionsFor(query)
 	}
 	return suggestions{}
 }
@@ -40,7 +40,7 @@ func TestGetSuggestionsParseRawQuery(t *testing.T) {
 	app := App{}
 	app.Initialize()
 	app.cityRepository = &MyMockedObject{
-		mockFindSuggestionsFor: func(query string) suggestions {
+		mockFindRankedSuggestionsFor: func(query string) suggestions {
 			wasCalledWithParsedQuery = query == "something"
 			return suggestions{}
 		},
@@ -56,7 +56,7 @@ func TestGetSuggestionsShouldServeJsonData(t *testing.T) {
 	app := App{}
 	app.Initialize()
 	app.cityRepository = &MyMockedObject{
-		mockFindSuggestionsFor: func(query string) suggestions {
+		mockFindRankedSuggestionsFor: func(query string) suggestions {
 			return expectedSuggestions
 		},
 	}
