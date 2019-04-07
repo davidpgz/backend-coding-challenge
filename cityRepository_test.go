@@ -70,27 +70,27 @@ func TestCreateCityRepositoryForParseTsvFileData(t *testing.T) {
 	assert.New(t).NotEmpty(cityRepository.records)
 }
 
-func TestFindSuggestionsForExactName(t *testing.T) {
+func TestFindSuggestionsForExactName_ShouldHaveScoreOf1(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindSuggestionsFor("Québec")
+	result := cityRepository.findSuggestionsFor("Québec")
 	assert.New(t).Equal(float32(1.0), result.Suggestions[0].Score)
 }
 
-func TestFindSuggestionsForPartialName(t *testing.T) {
+func TestFindSuggestionsForPartialName_ShouldHaveScoreRatioMatchingNumberOfChar(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindSuggestionsFor("qué")
+	result := cityRepository.findSuggestionsFor("qué")
 	assert.New(t).Equal(float32(3.0/6.0), result.Suggestions[0].Score)
 }
 
-func TestFindSuggestionsForPartialAsciiName(t *testing.T) {
+func TestFindSuggestionsForPartialAsciiName_ShouldHaveScoreRatioMatchingNumberOfChar(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindSuggestionsFor("queb")
+	result := cityRepository.findSuggestionsFor("queb")
 	assert.New(t).Equal(float32(4.0/6.0), result.Suggestions[0].Score)
 }
 
-func TestFindSuggestionsForPartialAlternateName(t *testing.T) {
+func TestFindSuggestionsForPartialAlternateName_ShouldHaveScoreRatioMatchingNumberOfChar(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindSuggestionsFor("udad ti Que")
+	result := cityRepository.findSuggestionsFor("udad ti Que")
 	assert.New(t).Equal(float32(11.0/16.0), result.Suggestions[0].Score)
 }
 
