@@ -59,13 +59,13 @@ func TestFindSuggestionsForPartialAlternateName(t *testing.T) {
 	assert.New(t).Contains(result.Suggestions[0].Name, "Québec")
 }
 
-func TestFindSuggestionsForAppendsAdmin1LevelAndCountryCodeToTheName(t *testing.T) {
+func TestFindSuggestionsFor_ShouldAppendsAdmin1LevelAndCountryCodeToTheName(t *testing.T) {
 	cityRepository := createCityRepository()
 	result := cityRepository.findSuggestionsFor("Québec")
 	assert.New(t).Contains(result.Suggestions[0].Name, "Québec, 10, CA")
 }
 
-func TestCreateCityRepositoryForParseTsvFileData(t *testing.T) {
+func TestCreateCityRepositoryFor_ShouldParseTsvFileData(t *testing.T) {
 	cityRepository := createCityRepository()
 	assert.New(t).NotEmpty(cityRepository.records)
 }
@@ -106,7 +106,7 @@ func TestFindSuggestionsForLongitude(t *testing.T) {
 	assert.New(t).Equal(-71.21454, result.Suggestions[0].Longitude)
 }
 
-func TestFindRankedSuggestionsForShouldSortSuggestionsByDescendingOrder(t *testing.T) {
+func TestFindRankedSuggestionsForPartialName_ShouldSortSuggestionsByDescendingOrder(t *testing.T) {
 	cityRepository := createCityRepository()
 
 	result := cityRepository.FindRankedSuggestionsFor("king")
