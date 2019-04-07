@@ -93,3 +93,15 @@ func TestFindRankedSuggestionsForPartialAlternateName(t *testing.T) {
 	result := cityRepository.FindRankedSuggestionsFor("udad ti Que")
 	assert.New(t).Equal(float32(11.0/16.0), result.Suggestions[0].Score)
 }
+
+func TestFindSuggestionsForLatitude(t *testing.T) {
+	cityRepository := createCityRepository()
+	result := cityRepository.findSuggestionsFor("Québec")
+	assert.New(t).Equal(46.81228, result.Suggestions[0].Latitude)
+}
+
+func TestFindSuggestionsForLongitude(t *testing.T) {
+	cityRepository := createCityRepository()
+	result := cityRepository.findSuggestionsFor("Québec")
+	assert.New(t).Equal(-71.21454, result.Suggestions[0].Longitude)
+}

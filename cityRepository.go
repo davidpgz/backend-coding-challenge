@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -12,6 +13,8 @@ const (
 	name            = 1
 	asciiname       = 2
 	alternatenames  = 3
+	latitude        = 4
+	longitude       = 5
 	countrycode     = 8
 	adminLevel1Code = 10
 )
@@ -83,8 +86,10 @@ func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
 		if matched {
 			cityName := fetchCityNameOf(record)
 			match := match{
-				Name:  fmt.Sprintf("%s, %s, %s", cityName, fetchFirstAdministrationLevelOf(record), fetchCountryNameOf(record)),
-				Score: score,
+				Name:      fmt.Sprintf("%s, %s, %s", cityName, fetchFirstAdministrationLevelOf(record), fetchCountryNameOf(record)),
+				Latitude:  fetchLatitude(record),
+				Longitude: fetchLongitude(record),
+				Score:     score,
 			}
 			result.Suggestions = append(result.Suggestions, match)
 		}
@@ -166,4 +171,20 @@ func fetchFirstAdministrationLevelOf(record []string) string {
 		return record[adminLevel1Code]
 	}
 	return "-"
+}
+
+func fetchLatitude(record []string) float64 {
+	if len(record) > latitude {
+		value, _ := strconv.ParseFloat(record[latitude], 64)
+		return value
+	}
+	return 0.0
+}
+
+func fetchLongitude(record []string) float64 {
+	if len(record) > longitude {
+		value, _ := strconv.ParseFloat(record[longitude], 64)
+		return value
+	}
+	return 0.0
 }
