@@ -70,27 +70,27 @@ func TestCreateCityRepositoryForParseTsvFileData(t *testing.T) {
 	assert.New(t).NotEmpty(cityRepository.records)
 }
 
-func TestFindRankedSuggestionsForExactName(t *testing.T) {
+func TestFindSuggestionsForExactName(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindRankedSuggestionsFor("Québec")
+	result := cityRepository.FindSuggestionsFor("Québec")
 	assert.New(t).Equal(float32(1.0), result.Suggestions[0].Score)
 }
 
-func TestFindRankedSuggestionsForPartialName(t *testing.T) {
+func TestFindSuggestionsForPartialName(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindRankedSuggestionsFor("qué")
+	result := cityRepository.FindSuggestionsFor("qué")
 	assert.New(t).Equal(float32(3.0/6.0), result.Suggestions[0].Score)
 }
 
-func TestFindRankedSuggestionsForPartialAsciiName(t *testing.T) {
+func TestFindSuggestionsForPartialAsciiName(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindRankedSuggestionsFor("queb")
+	result := cityRepository.FindSuggestionsFor("queb")
 	assert.New(t).Equal(float32(4.0/6.0), result.Suggestions[0].Score)
 }
 
-func TestFindRankedSuggestionsForPartialAlternateName(t *testing.T) {
+func TestFindSuggestionsForPartialAlternateName(t *testing.T) {
 	cityRepository := createCityRepository()
-	result := cityRepository.FindRankedSuggestionsFor("udad ti Que")
+	result := cityRepository.FindSuggestionsFor("udad ti Que")
 	assert.New(t).Equal(float32(11.0/16.0), result.Suggestions[0].Score)
 }
 
@@ -104,4 +104,15 @@ func TestFindSuggestionsForLongitude(t *testing.T) {
 	cityRepository := createCityRepository()
 	result := cityRepository.findSuggestionsFor("Québec")
 	assert.New(t).Equal(-71.21454, result.Suggestions[0].Longitude)
+}
+
+func TestFindRankedSuggestionsForShouldSortSuggestionsByDescendingOrder(t *testing.T) {
+	cityRepository := createCityRepository()
+
+	result := cityRepository.FindRankedSuggestionsFor("king")
+
+	assert := assert.New(t)
+	assert.True(result.Suggestions[0].Score >= result.Suggestions[1].Score)
+	assert.True(result.Suggestions[1].Score >= result.Suggestions[2].Score)
+	assert.True(result.Suggestions[2].Score >= result.Suggestions[3].Score)
 }

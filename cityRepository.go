@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -68,7 +69,10 @@ func createReaderForTsvFileAndQuoteInValues(tsvFile *os.File) *csv.Reader {
 
 func (repository *cityRepository) FindRankedSuggestionsFor(query string) suggestions {
 	suggestions := repository.findSuggestionsFor(query)
-
+	// Sort suggestions by descending order
+	sort.SliceStable(suggestions.Suggestions, func(i, j int) bool {
+		return suggestions.Suggestions[i].Score > suggestions.Suggestions[j].Score
+	})
 	return suggestions
 }
 
