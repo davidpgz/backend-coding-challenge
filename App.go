@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"strings"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +29,7 @@ func (a *App) Initialize() error {
 	})
 
 	router.GET(suggestionsPath, func(context *gin.Context) {
-		query := parseRawQuery(context.Request.URL.RawQuery)
+		query := parseCityQuery(context.Request.URL.Query())
 		suggestions := a.cityRepository.FindRankedSuggestionsFor(query)
 		context.JSON(http.StatusOK, suggestions)
 	})
@@ -44,8 +44,12 @@ func (a *App) Initialize() error {
 	return nil
 }
 
-func parseRawQuery(rawQuery string) string {
-	return strings.Replace(rawQuery, "q=", "", 1)
+func parseCityQuery(queryValues url.Values) cityQuery {
+	return cityQuery{
+		name:      queryValues.Get("q"),
+		latitude:  queryValues.Get("latitude"),
+		longitude: queryValues.Get("longitude"),
+	}
 }
 
 // Run the web service.

@@ -10,10 +10,10 @@ import (
 )
 
 type mockCityRepository struct {
-	mockFindRankedSuggestionsFor func(string) suggestions
+	mockFindRankedSuggestionsFor func(cityQuery) suggestions
 }
 
-func (mock *mockCityRepository) FindRankedSuggestionsFor(query string) suggestions {
+func (mock *mockCityRepository) FindRankedSuggestionsFor(query cityQuery) suggestions {
 	if mock.mockFindRankedSuggestionsFor != nil {
 		return mock.mockFindRankedSuggestionsFor(query)
 	}
@@ -27,7 +27,7 @@ func (app *App) serveGetSuggestions(path string) *httptest.ResponseRecorder {
 	return recorder
 }
 
-func (app *App) mockFindRankedSuggestionsFor(funcMock func(string) suggestions) {
+func (app *App) mockFindRankedSuggestionsFor(funcMock func(cityQuery) suggestions) {
 	app.cityRepository = &mockCityRepository{funcMock}
 }
 
@@ -44,11 +44,11 @@ func TestInitializeCanServeGetSuggestions(t *testing.T) {
 	assert.New(t).Equal(http.StatusOK, recorder.Code)
 }
 
-func TestGetSuggestionsParseRawQuery(t *testing.T) {
+func TestGetSuggestionsForCityName_ShouldParseQueryCityName(t *testing.T) {
 	var wasCalledWithParsedQuery bool
 	app := newInitializedApp()
-	app.mockFindRankedSuggestionsFor(func(query string) suggestions {
-		wasCalledWithParsedQuery = query == "something"
+	app.mockFindRankedSuggestionsFor(func(query cityQuery) suggestions {
+		wasCalledWithParsedQuery = query.name == "something"
 		return suggestions{}
 	})
 
@@ -57,10 +57,36 @@ func TestGetSuggestionsParseRawQuery(t *testing.T) {
 	assert.New(t).True(wasCalledWithParsedQuery)
 }
 
-func TestGetSuggestionsShouldServeJsonData(t *testing.T) {
+func TestGetSuggestionsForCityNameAndLatitude_ShouldParseQueryCityNameAndLatitude(t *testing.T) {
+	var wasCalledWithParsedQuery bool
+	app := newInitializedApp()
+	app.mockFindRankedSuggestionsFor(func(query cityQuery) suggestions {
+		wasCalledWithParsedQuery = query.name == "something" && query.latitude == "12.345"
+		return suggestions{}
+	})
+
+	app.serveGetSuggestions(suggestionsPath + "?q=something&latitude=12.345")
+
+	assert.New(t).True(wasCalledWithParsedQuery)
+}
+
+func TestGetSuggestionsForCityNameAndLongitude_ShouldParseQueryCityNameAndLongitude(t *testing.T) {
+	var wasCalledWithParsedQuery bool
+	app := newInitializedApp()
+	app.mockFindRankedSuggestionsFor(func(query cityQuery) suggestions {
+		wasCalledWithParsedQuery = query.name == "something" && query.longitude == "12.345"
+		return suggestions{}
+	})
+
+	app.serveGetSuggestions(suggestionsPath + "?q=something&longitude=12.345")
+
+	assert.New(t).True(wasCalledWithParsedQuery)
+}
+
+func TestGetSuggestionsForCityName_ShouldServeJsonData(t *testing.T) {
 	expectedSuggestions := suggestions{[]match{match{Name: "something", Longitude: -1.2, Latitude: 3.4, Score: 0.5}}}
 	app := newInitializedApp()
-	app.mockFindRankedSuggestionsFor(func(query string) suggestions {
+	app.mockFindRankedSuggestionsFor(func(query cityQuery) suggestions {
 		return expectedSuggestions
 	})
 

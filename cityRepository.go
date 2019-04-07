@@ -36,7 +36,13 @@ type cityRepository struct {
 }
 
 type cityRepositoryInterface interface {
-	FindRankedSuggestionsFor(string) suggestions
+	FindRankedSuggestionsFor(cityQuery) suggestions
+}
+
+type cityQuery struct {
+	name      string
+	latitude  string
+	longitude string
 }
 
 // Creates a CityRepository using TSV file as the data source.
@@ -67,7 +73,7 @@ func createReaderForTsvFileAndQuoteInValues(tsvFile *os.File) *csv.Reader {
 	return reader
 }
 
-func (repository *cityRepository) FindRankedSuggestionsFor(query string) suggestions {
+func (repository *cityRepository) FindRankedSuggestionsFor(query cityQuery) suggestions {
 	suggestions := repository.findSuggestionsFor(query)
 	// Sort suggestions by descending order
 	sort.SliceStable(suggestions.Suggestions, func(i, j int) bool {
@@ -76,17 +82,17 @@ func (repository *cityRepository) FindRankedSuggestionsFor(query string) suggest
 	return suggestions
 }
 
-func (repository *cityRepository) findSuggestionsFor(query string) suggestions {
+func (repository *cityRepository) findSuggestionsFor(query cityQuery) suggestions {
 	result := suggestions{Suggestions: []match{}}
 
-	if query == "" {
+	if query.name == "" {
 		return result
 	}
 
-	queryName := strings.ToLower(query)
+	queryCityName := strings.ToLower(query.name)
 
 	for _, record := range repository.records {
-		matched, score := matchQueryName(record, queryName)
+		matched, score := matchQueryName(record, queryCityName)
 		if matched {
 			cityName := fetchCityNameOf(record)
 			match := match{
