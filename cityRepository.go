@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -89,10 +90,10 @@ func (repository *cityRepository) findSuggestionsFor(query cityQuery) suggestion
 		return result
 	}
 
-	queryCityName := strings.ToLower(query.name)
+	query.name = strings.ToLower(query.name)
 
 	for _, record := range repository.records {
-		matched, score := matchQueryName(record, queryCityName)
+		matched, score := matchQueryName(record, query)
 		if matched {
 			cityName := fetchCityNameOf(record)
 			match := match{
@@ -108,24 +109,42 @@ func (repository *cityRepository) findSuggestionsFor(query cityQuery) suggestion
 	return result
 }
 
-func matchQueryName(record []string, queryName string) (bool, float32) {
+func matchQueryName(record []string, query cityQuery) (bool, float32) {
 	matched := false
 	score := 0.0
 
-	if matched = strings.Contains(strings.ToLower(fetchCityNameOf(record)), queryName); matched {
-		score = computeScoreFor(queryName, fetchCityNameOf(record))
-	} else if matched = strings.Contains(strings.ToLower(record[asciiname]), queryName); matched {
-		score = computeScoreFor(queryName, record[asciiname])
-	} else if matched = strings.Contains(strings.ToLower(record[alternatenames]), queryName); matched {
-		matchedWholeWord := findMatchingAlternateNameWholeWord(record[alternatenames], queryName)
-		score = computeScoreFor(queryName, matchedWholeWord)
+	if matched = strings.Contains(strings.ToLower(fetchCityNameOf(record)), query.name); matched {
+		score = computeScoreFor(query, fetchCityNameOf(record), record)
+	} else if matched = strings.Contains(strings.ToLower(record[asciiname]), query.name); matched {
+		score = computeScoreFor(query, record[asciiname], record)
+	} else if matched = strings.Contains(strings.ToLower(record[alternatenames]), query.name); matched {
+		matchedWholeWord := findMatchingAlternateNameWholeWord(record[alternatenames], query.name)
+		score = computeScoreFor(query, matchedWholeWord, record)
 	}
 
 	return matched, float32(score)
 }
 
-func computeScoreFor(queryName string, matchedWord string) float64 {
-	return float64(utf8.RuneCountInString(queryName)) / float64(utf8.RuneCountInString(matchedWord))
+func computeScoreFor(query cityQuery, matchedWord string, record []string) float64 {
+	matchedLengthScore := float64(utf8.RuneCountInString(query.name)) / float64(utf8.RuneCountInString(matchedWord))
+	latitudeScore := 1.0
+	longitudeScore := 1.0
+
+	queryLatitude, err := strconv.ParseFloat(query.latitude, 64)
+	if err == nil {
+		recordLatitude := fetchLatitude(record)
+		distanceRatio := math.Abs(queryLatitude-recordLatitude) / 180.0
+		latitudeScore = 1.0 - distanceRatio
+	}
+
+	queryLongitude, err := strconv.ParseFloat(query.longitude, 64)
+	if err == nil {
+		recordLongitude := fetchLongitude(record)
+		distanceRatio := math.Abs(queryLongitude-recordLongitude) / 360.0
+		longitudeScore = 1.0 - distanceRatio
+	}
+
+	return matchedLengthScore * latitudeScore * longitudeScore
 }
 
 func findMatchingAlternateNameWholeWord(recordAlternateNames string, queryName string) string {
