@@ -1,4 +1,4 @@
-package main
+package challenge
 
 import (
 	"net/http"
@@ -21,8 +21,8 @@ type App struct {
 func (a *App) Initialize() error {
 	router := gin.New()
 	router.Use(gin.Logger())
-	router.LoadHTMLGlob("templates/*.tmpl.html")
-	router.Static("/static", "static")
+	router.LoadHTMLGlob("web/templates/*.tmpl.html")
+	router.Static("/web/static", "web/static")
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl.html", nil)

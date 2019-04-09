@@ -1,5 +1,5 @@
-static/* linguist-vendored
-templates/* linguist-vendored
+web/static/* linguist-vendored
+web/templates/* linguist-vendored
 vendor/* linguist-vendored
 app.json linguist-documentation
 heroku.yml linguist-documentation
