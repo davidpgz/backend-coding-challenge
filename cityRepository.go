@@ -126,25 +126,38 @@ func matchQueryName(record []string, query cityQuery) (bool, float32) {
 }
 
 func computeScoreFor(query cityQuery, matchedWord string, record []string) float64 {
-	matchedLengthScore := float64(utf8.RuneCountInString(query.name)) / float64(utf8.RuneCountInString(matchedWord))
-	latitudeScore := 1.0
-	longitudeScore := 1.0
+	matchingCharWeight := computeMatchingCharWeight(query.name, matchedWord)
+	latitudeWeight := computeLatitudeScoreWeight(query, record)
+	longitudeWeight := computeLongitudeScoreWeight(query, record)
+	return matchingCharWeight * latitudeWeight * longitudeWeight
+}
+
+func computeMatchingCharWeight(queryName string, matchedWord string) float64 {
+	return float64(utf8.RuneCountInString(queryName)) / float64(utf8.RuneCountInString(matchedWord))
+}
+
+func computeLatitudeScoreWeight(query cityQuery, record []string) float64 {
+	const latitudeMaximumRange float64 = 180.0
 
 	queryLatitude, err := strconv.ParseFloat(query.latitude, 64)
 	if err == nil {
 		recordLatitude := fetchLatitude(record)
-		distanceRatio := math.Abs(queryLatitude-recordLatitude) / 180.0
-		latitudeScore = 1.0 - distanceRatio
+		distanceRatio := math.Abs(queryLatitude-recordLatitude) / latitudeMaximumRange
+		return 1 - distanceRatio
 	}
+	return 1
+}
+
+func computeLongitudeScoreWeight(query cityQuery, record []string) float64 {
+	const longitudeMaximumRange float64 = 360.0
 
 	queryLongitude, err := strconv.ParseFloat(query.longitude, 64)
 	if err == nil {
 		recordLongitude := fetchLongitude(record)
-		distanceRatio := math.Abs(queryLongitude-recordLongitude) / 360.0
-		longitudeScore = 1.0 - distanceRatio
+		distanceRatio := math.Abs(queryLongitude-recordLongitude) / longitudeMaximumRange
+		return 1 - distanceRatio
 	}
-
-	return matchedLengthScore * latitudeScore * longitudeScore
+	return 1
 }
 
 func findMatchingAlternateNameWholeWord(recordAlternateNames string, queryName string) string {
