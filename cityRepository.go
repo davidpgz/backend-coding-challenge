@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	name            = 1
-	asciiname       = 2
-	alternatenames  = 3
-	latitude        = 4
-	longitude       = 5
-	countrycode     = 8
-	adminLevel1Code = 10
+	cityNameIndex            = 1
+	cityASCIINameIndex       = 2
+	cityAlernateNamesIndex   = 3
+	cityLatitudeIndex        = 4
+	cityLongitudeIndex       = 5
+	cityCountryCodeIndex     = 8
+	cityAdminLevel1CodeIndex = 10
 )
 
 type match struct {
@@ -115,10 +115,10 @@ func matchQueryName(record []string, query cityQuery) (bool, float32) {
 
 	if matched = strings.Contains(strings.ToLower(fetchCityNameOf(record)), query.name); matched {
 		score = computeScoreFor(query, fetchCityNameOf(record), record)
-	} else if matched = strings.Contains(strings.ToLower(record[asciiname]), query.name); matched {
-		score = computeScoreFor(query, record[asciiname], record)
-	} else if matched = strings.Contains(strings.ToLower(record[alternatenames]), query.name); matched {
-		matchedWholeWord := findMatchingAlternateNameWholeWord(record[alternatenames], query.name)
+	} else if matched = strings.Contains(strings.ToLower(record[cityASCIINameIndex]), query.name); matched {
+		score = computeScoreFor(query, record[cityASCIINameIndex], record)
+	} else if matched = strings.Contains(strings.ToLower(record[cityAlernateNamesIndex]), query.name); matched {
+		matchedWholeWord := findMatchingAlternateNameWholeWord(record[cityAlernateNamesIndex], query.name)
 		score = computeScoreFor(query, matchedWholeWord, record)
 	}
 
@@ -195,37 +195,37 @@ func findAlternateNameWordEndIndex(alternateNames []rune, searchStartIndex int) 
 }
 
 func fetchCityNameOf(record []string) string {
-	if len(record) > name {
-		return record[name]
+	if len(record) > cityNameIndex {
+		return record[cityNameIndex]
 	}
 	return "-"
 }
 
 func fetchCountryNameOf(record []string) string {
-	if len(record) > countrycode {
-		return record[countrycode]
+	if len(record) > cityCountryCodeIndex {
+		return record[cityCountryCodeIndex]
 	}
 	return "-"
 }
 
 func fetchFirstAdministrationLevelOf(record []string) string {
-	if len(record) > adminLevel1Code {
-		return record[adminLevel1Code]
+	if len(record) > cityAdminLevel1CodeIndex {
+		return record[cityAdminLevel1CodeIndex]
 	}
 	return "-"
 }
 
 func fetchLatitude(record []string) float64 {
-	if len(record) > latitude {
-		value, _ := strconv.ParseFloat(record[latitude], 64)
+	if len(record) > cityLatitudeIndex {
+		value, _ := strconv.ParseFloat(record[cityLatitudeIndex], 64)
 		return value
 	}
 	return 0.0
 }
 
 func fetchLongitude(record []string) float64 {
-	if len(record) > longitude {
-		value, _ := strconv.ParseFloat(record[longitude], 64)
+	if len(record) > cityLongitudeIndex {
+		value, _ := strconv.ParseFloat(record[cityLongitudeIndex], 64)
 		return value
 	}
 	return 0.0
