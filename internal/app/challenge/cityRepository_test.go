@@ -113,13 +113,13 @@ func TestFindSuggestionsForLongitude(t *testing.T) {
 }
 
 func TestFindSuggestionsForLatitude_ShouldChangeScore(t *testing.T) {
-	cityRepository := cityRepository{records: [][]string{[]string{"", "somecity", "", "", "45.0", "-90.0", "", "", "", "", ""}}}
+	cityRepository := cityRepository{records: []cityRecord{cityRecord{[]string{"", "somecity", "", "", "45.0", "-90.0", "", "", "", "", ""}}}}
 	result := cityRepository.findSuggestionsFor(cityQuery{name: "city", latitude: "0.0"})
 	assert.New(t).Equal(float32(4.0/8.0*(1.0-45.0/180.0)), result.Suggestions[0].Score)
 }
 
 func TestFindSuggestionsForLongitude_ShouldChangeScore(t *testing.T) {
-	cityRepository := cityRepository{records: [][]string{[]string{"", "somecity", "", "", "45.0", "-90.0", "", "", "", "", ""}}}
+	cityRepository := cityRepository{records: []cityRecord{cityRecord{[]string{"", "somecity", "", "", "45.0", "-90.0", "", "", "", "", ""}}}}
 	result := cityRepository.findSuggestionsFor(cityQuery{name: "city", longitude: "0.0"})
 	assert.New(t).Equal(float32(4.0/8.0*(1.0-90.0/360.0)), result.Suggestions[0].Score)
 }
