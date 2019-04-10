@@ -21,29 +21,12 @@ const (
 	cityAdminLevel1CodeIndex = 10
 )
 
-type match struct {
-	Name      string  `json:"name"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	Score     float32 `json:"score"`
-}
-
-type suggestions struct {
-	Suggestions []match `json:"suggestions"`
-}
-
 type cityRepository struct {
 	records [][]string
 }
 
 type cityRepositoryInterface interface {
 	FindRankedSuggestionsFor(cityQuery) suggestions
-}
-
-type cityQuery struct {
-	name      string
-	latitude  string
-	longitude string
 }
 
 // Creates a CityRepository using TSV file as the data source.
