@@ -31,7 +31,7 @@ func (a *App) Initialize(sourcePath string) error {
 	router.GET(suggestionsPath, func(context *gin.Context) {
 		query := parseCityQuery(context.Request.URL.Query())
 		suggestions := a.cityRepository.FindRankedSuggestionsFor(query)
-		context.JSON(http.StatusOK, suggestions)
+		context.IndentedJSON(http.StatusOK, suggestions)
 	})
 
 	cityRepository, err := createCityRepositoryFor(sourcePath)
