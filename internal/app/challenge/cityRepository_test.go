@@ -7,7 +7,7 @@ import (
 )
 
 func createCityRepository() cityRepository {
-	cityRepository, _ := createCityRepositoryFor("./data/cities_canada-usa.tsv")
+	cityRepository, _ := createCityRepositoryFor("./../../../data/cities_canada-usa.tsv")
 	return cityRepository
 }
 

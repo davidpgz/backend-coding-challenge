@@ -15,7 +15,7 @@ func main() {
 	}
 
 	app := challenge.App{}
-	err := app.Initialize()
+	err := app.Initialize("./data/cities_canada-usa.tsv")
 	if err != nil {
 		log.Fatal(err)
 	}

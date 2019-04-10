@@ -33,7 +33,7 @@ func (app *App) mockFindRankedSuggestionsFor(funcMock func(cityQuery) suggestion
 
 func newInitializedApp() *App {
 	app := App{}
-	app.Initialize()
+	app.Initialize("./../../../data/cities_canada-usa.tsv")
 	return &app
 }
 

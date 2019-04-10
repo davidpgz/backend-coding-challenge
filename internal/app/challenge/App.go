@@ -18,7 +18,7 @@ type App struct {
 }
 
 // Initialize the App struct before the Run function is called
-func (a *App) Initialize() error {
+func (a *App) Initialize(sourcePath string) error {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.LoadHTMLGlob("web/templates/*.tmpl.html")
@@ -34,7 +34,7 @@ func (a *App) Initialize() error {
 		context.JSON(http.StatusOK, suggestions)
 	})
 
-	cityRepository, err := createCityRepositoryFor("./data/cities_canada-usa.tsv")
+	cityRepository, err := createCityRepositoryFor(sourcePath)
 	if err != nil {
 		return err
 	}
